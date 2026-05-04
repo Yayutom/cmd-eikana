@@ -25,6 +25,16 @@ Also, the configuration file is located at ~ / Library / Preferences / io.github
 ## License
 MIT License
 
+## Build settings policy (Xcode)
+- The project file (`⌘英かな.xcodeproj/project.pbxproj`) is updated to current recommended-setting metadata (`LastUpgradeCheck`).
+- `MACOSX_DEPLOYMENT_TARGET` is unified to `10.12` for project / app target / helper target to avoid per-target drift in CI.
+- Legacy explicit signing identity (`CODE_SIGN_IDENTITY = "-"`) is removed; each target now uses:
+  - `CODE_SIGN_STYLE = Automatic`
+  - `DEVELOPMENT_TEAM = ""` (set your Team ID in Xcode or via xcconfig/CI at build time)
+- Verify effective settings locally or in CI with:
+  - `xcodebuild -project "⌘英かな.xcodeproj" -scheme "⌘英かな" -configuration Debug -showBuildSettings`
+  - `xcodebuild -project "⌘英かな.xcodeproj" -scheme "⌘英かな" -configuration Release -showBuildSettings`
+
 
 # ⌘英かな
 
@@ -59,3 +69,13 @@ https://ei-kana.appspot.com/
 
 ## ライセンス
 MIT License
+
+## ビルド設定方針（Xcode）
+- `⌘英かな.xcodeproj/project.pbxproj` の `LastUpgradeCheck` は最新Xcode想定の値に更新しています。
+- `MACOSX_DEPLOYMENT_TARGET` は、Project / アプリ本体 / helper のすべてで `10.12` に統一しています（CIでの差分揺れ防止）。
+- 旧来の `CODE_SIGN_IDENTITY = "-"` は削除し、各ターゲットを以下に統一しています。
+  - `CODE_SIGN_STYLE = Automatic`
+  - `DEVELOPMENT_TEAM = ""`（配布時はXcodeまたはCI側でTeam IDを設定）
+- 実効値の確認コマンド:
+  - `xcodebuild -project "⌘英かな.xcodeproj" -scheme "⌘英かな" -configuration Debug -showBuildSettings`
+  - `xcodebuild -project "⌘英かな.xcodeproj" -scheme "⌘英かな" -configuration Release -showBuildSettings`
