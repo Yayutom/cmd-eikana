@@ -33,6 +33,25 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         checkUpdateAtlaunch.state = NSControl.StateValue(rawValue: userDefaults.integer(forKey: "checkUpdateAtlaunch"))
     }
 
+
+    private func showLaunchAtStartupError(_ error: LaunchAtStartupError) {
+        let alert = NSAlert()
+
+        switch error {
+        case .permissionDenied:
+            alert.messageText = "ログイン項目の変更が許可されていません"
+            alert.informativeText = "システム設定 > 一般 > ログイン項目で、⌘英かなのバックグラウンド項目を許可してから再度お試しください。"
+        case .unavailable:
+            alert.messageText = "ログイン項目の変更に失敗しました"
+            alert.informativeText = "macOSの状態により変更できない可能性があります。時間をおいて再度お試しください。"
+        case .unknown:
+            alert.messageText = "ログイン項目の変更時にエラーが発生しました"
+            alert.informativeText = "システム設定 > 一般 > ログイン項目を確認してから再度お試しください。"
+        }
+
+        alert.runModal()
+    }
+
     override var representedObject: Any? {
         didSet {
         // Update the view, if already loaded.
@@ -45,8 +64,17 @@ class ViewController: NSViewController, NSTableViewDataSource, NSTableViewDelega
         userDefaults.set(showIcon.state, forKey: "showIcon")
     }
     @IBAction func clickLunchAtStartup(_ sender: AnyObject) {
-        setLaunchAtStartup(lunchAtStartup.state == NSControl.StateValue.on)
-        userDefaults.set(lunchAtStartup.state, forKey: "lunchAtStartup")
+        let enabled = (lunchAtStartup.state == NSControl.StateValue.on)
+        let result = setLaunchAtStartup(enabled)
+
+        switch result {
+        case .success:
+            userDefaults.set(lunchAtStartup.state, forKey: "lunchAtStartup")
+        case .failure(let error):
+            lunchAtStartup.state = enabled ? .off : .on
+            userDefaults.set(lunchAtStartup.state, forKey: "lunchAtStartup")
+            showLaunchAtStartupError(error)
+        }
     }
     @IBAction func clickCheckUpdateAtlaunch(_ sender: AnyObject) {
         userDefaults.set(checkUpdateAtlaunch.state, forKey: "checkUpdateAtlaunch")
